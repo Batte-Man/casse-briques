@@ -1,0 +1,11 @@
+# Build / IDE
+out/
+bin/
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+# Donnees generees a l'execution
+scores.txt
+scores.dat
