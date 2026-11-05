@@ -123,6 +123,28 @@ public class MenuScreen extends AbstractScreen {
         });
 
         combo.setUI(new BasicComboBoxUI() {
+            // BasicComboBoxUI remplace le fond de la valeur affichée par
+            // UIManager "ComboBox.background" (gris clair) quand la liste n'a pas
+            // le focus : le texte clair devenait illisible. On dessine nous-mêmes.
+            @Override
+            public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
+                g.setColor(UIConfig.BG_COLOR_SECONDARY);
+                g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public void paintCurrentValue(Graphics g, Rectangle bounds, boolean hasFocus) {
+                ListCellRenderer<Object> renderer = (ListCellRenderer<Object>) comboBox.getRenderer();
+                Component c = renderer.getListCellRendererComponent(
+                        listBox, comboBox.getSelectedItem(), -1, false, false);
+                c.setFont(comboBox.getFont());
+                c.setForeground(UIConfig.FG_COLOR_PRIMARY);
+                c.setBackground(UIConfig.BG_COLOR_SECONDARY);
+                currentValuePane.paintComponent(g, c, comboBox,
+                        bounds.x, bounds.y, bounds.width, bounds.height, false);
+            }
+
             @Override
             protected JButton createArrowButton() {
                 JButton arrow = super.createArrowButton();
