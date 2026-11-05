@@ -126,8 +126,10 @@ public class GameEngine {
         for (Updatable u : snapshot) {
             if (u instanceof Ball b) {
                 if (b.getY() + b.getSize() >= GameConfig.HEIGHT) {
-                    endGame();
-                    return;
+                    // Balle perdue : on la retire. La partie ne se termine que
+                    // lorsqu'il ne reste plus aucune balle (cas du multi-balles).
+                    remove(b);
+                    continue;
                 }
                 collisionService.handleWallCollision(this, b);
                 collisionService.handlePaddleCollision(this, b, paddle);
@@ -146,6 +148,13 @@ public class GameEngine {
             if (u instanceof Brick br && br.isDestroyed()) {
                 remove(br);
             }
+        }
+
+        boolean anyBall = !newBalls.isEmpty()
+                || getUpdatables().stream().anyMatch(u -> u instanceof Ball);
+        if (!anyBall) {
+            endGame();
+            return;
         }
 
         boolean anyBricks = getUpdatables().stream().anyMatch(u -> u instanceof Brick);
