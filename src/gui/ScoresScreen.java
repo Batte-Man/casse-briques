@@ -16,6 +16,7 @@ import java.util.List;
 public class ScoresScreen extends AbstractScreen {
     private final IScoreService scoreService;
     private final GameController controller;
+    private final DefaultListModel<String> model = new DefaultListModel<>();
 
     public ScoresScreen(ScreenManager screens, IScoreService scoreService, GameController controller) {
         super(screens);
@@ -35,17 +36,6 @@ public class ScoresScreen extends AbstractScreen {
         title.setFont(UIConfig.TITLE_FONT);
         title.setForeground(UIConfig.FG_COLOR_PRIMARY);
         panel.add(title, BorderLayout.NORTH);
-
-        DefaultListModel<String> model = new DefaultListModel<>();
-        try {
-            List<ScoreEntry> scores = new ArrayList<>(scoreService.getAllScores());
-            scores.sort((a, b) -> Integer.compare(b.points(), a.points()));
-            for (ScoreEntry entry : scores) {
-                model.addElement(entry.player() + " : " + entry.points());
-            }
-        } catch (ServiceException e) {
-            model.addElement("Erreur chargement des scores");
-        }
 
         JList<String> list = new JList<>(model);
         list.setFont(UIConfig.BUTTON_FONT);
@@ -67,6 +57,24 @@ public class ScoresScreen extends AbstractScreen {
 
     @Override
     protected void initListeners() {
+    }
+
+    /** Recharge les scores à chaque affichage (sinon un score sauvegardé n'apparaît qu'au redémarrage). */
+    @Override
+    public void onShow() {
+        model.clear();
+        try {
+            List<ScoreEntry> scores = new ArrayList<>(scoreService.getAllScores());
+            scores.sort((a, b) -> Integer.compare(b.points(), a.points()));
+            if (scores.isEmpty()) {
+                model.addElement("Aucun score pour l'instant");
+            }
+            for (ScoreEntry entry : scores) {
+                model.addElement(entry.player() + " : " + entry.points());
+            }
+        } catch (ServiceException e) {
+            model.addElement("Erreur chargement des scores");
+        }
     }
 
     private JButton createStyledButton(String text) {
