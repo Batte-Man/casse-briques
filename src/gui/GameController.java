@@ -1,10 +1,11 @@
 package gui;
 
 import metier.Difficulty;
+import metier.GameEngine;
 import metier.IScoreService;
 import metier.ServiceException;
-import metier.GameEngine;
 import model.ScoreEntry;
+
 import javax.swing.*;
 import java.time.LocalDateTime;
 
@@ -13,7 +14,9 @@ public class GameController {
     private final GameEngine engine;
     private final GamePanel panel;
     private final IScoreService scoreService;
+    private GameOverScreen gameOverScreen;
     private Difficulty lastDifficulty;
+    private VictoryScreen victoryScreen;
 
     public GameController(ScreenManager screens,
                           GameEngine engine,
@@ -25,10 +28,18 @@ public class GameController {
         this.scoreService = scoreService;
     }
 
-    public void onStart(Difficulty difficulty) {
-        this.lastDifficulty = difficulty;
-        engine.startGame(difficulty);
+    public void setGameOverScreen(GameOverScreen screen) {
+        this.gameOverScreen = screen;
+    }
+
+    public void onStart(Difficulty diff) {
+        this.lastDifficulty = diff;
+        engine.initGame(diff);
         screens.show("game");
+    }
+
+    public void onPlay() {
+        engine.play();
     }
 
     public void onPause() {
@@ -41,39 +52,56 @@ public class GameController {
         screens.show("game");
     }
 
+    public void onViewScores() {
+        screens.show("scores");
+    }
+
+    public void onGameOver(int pts) {
+        if (gameOverScreen != null) {
+            gameOverScreen.setScore(pts);
+            screens.show("gameover");
+        }
+    }
+
+    public void onSaveScore(String name, int pts) {
+        if (name == null || name.isBlank()) {
+            JOptionPane.showMessageDialog(panel,
+                    "Entrez un nom valide", "Sauvegarde", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        try {
+            scoreService.saveScore(new ScoreEntry(name, pts, LocalDateTime.now()));
+        } catch (ServiceException e) {
+            JOptionPane.showMessageDialog(panel,
+                    "Impossible d'enregistrer le score", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        screens.show("scores");
+    }
+
+    public void onWin(int finalPoints) {
+        if (victoryScreen != null) {
+            victoryScreen.setScore(finalPoints);
+            screens.show("victory");
+        }
+    }
+
+    public void onNextLevel() {
+        engine.initGame(engine.getDifficulty());
+        screens.show("game");
+    }
+
     public void onRetry() {
         if (lastDifficulty != null) {
-            engine.startGame(lastDifficulty);
+            engine.initGame(lastDifficulty);
             screens.show("game");
         } else {
             screens.show("menu");
         }
     }
 
-    public void onGameOver(int finalPoints) {
-        String name = JOptionPane.showInputDialog(
-                panel,
-                "Entrez votre nom pour enregistrer le score :",
-                "Game Over",
-                JOptionPane.PLAIN_MESSAGE
-        );
-        if (name != null && !name.isBlank()) {
-            try {
-                scoreService.saveScore(new ScoreEntry(name, finalPoints, LocalDateTime.now()));
-            } catch (ServiceException e) {
-                JOptionPane.showMessageDialog(
-                        panel,
-                        "Impossible d'enregistrer le score",
-                        "Erreur",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
-        screens.show("scores");
+    public void setVictoryScreen(VictoryScreen vs) {
+        this.victoryScreen = vs;
     }
 
-
-    public void onViewScores() {
-        screens.show("scores");
-    }
 }

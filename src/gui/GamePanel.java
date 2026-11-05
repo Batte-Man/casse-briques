@@ -2,71 +2,67 @@ package gui;
 
 import metier.GameEngine;
 import metier.GameState;
-import metier.Updatable;
+import model.Ball;
 import model.GameConfig;
+import model.Paddle;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class GamePanel extends JPanel implements Runnable, Updatable {
+public class GamePanel extends JPanel implements Runnable {
     private final GameEngine engine;
-    private Thread loop;
     private GameController controller;
+    private Thread loop;
 
     public GamePanel(GameEngine engine) {
         this.engine = engine;
-        setBackground(UIConfig.BG_COLOR);
+        setBackground(UIConfig.BG_COLOR_PRIMARY);
+        setPreferredSize(new Dimension(GameConfig.WIDTH, GameConfig.HEIGHT));
         setFocusable(true);
         requestFocusInWindow();
-        setPreferredSize(new Dimension(GameConfig.WIDTH, GameConfig.HEIGHT));
-        engine.register(this);
+        bindKeys();
+        startLoop();
     }
 
-    public void bindKeys() {
-        InputMap inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = getActionMap();
+    public void setController(GameController controller) {
+        this.controller = controller;
+    }
 
-        inputMap.put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
-        actionMap.put("moveLeft", new MoveAction(engine, -1));
-
-        inputMap.put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
-        actionMap.put("moveRight", new MoveAction(engine, 1));
-
-        inputMap.put(KeyStroke.getKeyStroke("ENTER"), "startGame");
-        actionMap.put("startGame", new AbstractAction() {
+    private void bindKeys() {
+        InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = getActionMap();
+        im.put(KeyStroke.getKeyStroke("LEFT"), "moveLeft");
+        am.put("moveLeft", new MoveAction(engine, -1));
+        im.put(KeyStroke.getKeyStroke("RIGHT"), "moveRight");
+        am.put("moveRight", new MoveAction(engine, 1));
+        im.put(KeyStroke.getKeyStroke("ENTER"), "play");
+        am.put("play", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (engine.getState() == GameState.READY) {
-                    controller.onStart(engine.getDifficulty());
-                    startLoop();
+                if (engine.getState() == GameState.READY && controller != null) {
+                    controller.onPlay();
+                    requestFocusInWindow();
                 }
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke('p'), "togglePause");
-        actionMap.put("togglePause", new AbstractAction() {
+        im.put(KeyStroke.getKeyStroke('p'), "togglePause");
+        am.put("togglePause", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (engine.getState() == GameState.RUNNING) {
-                    engine.pauseGame();
-                    ScreenManagerHolder.get().show("pause");
+                    controller.onPause();
                 } else if (engine.getState() == GameState.PAUSED) {
-                    engine.resumeGame();
-                    ScreenManagerHolder.get().show("game");
+                    controller.onResume();
                 }
             }
         });
     }
 
-    public void startLoop() {
-        if (loop != null && loop.isAlive()) {
-            loop.interrupt();
-        }
+    private void startLoop() {
         loop = new Thread(this, "GameLoop");
         loop.start();
     }
-
 
     @Override
     public void run() {
@@ -78,18 +74,19 @@ public class GamePanel extends JPanel implements Runnable, Updatable {
                 }
                 Thread.sleep(16);
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        } catch (InterruptedException ignored) {
         }
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (engine.getState() == GameState.READY) {
+            Paddle p = engine.getPaddle();
+            Ball b = engine.getBall();
+            b.setX(p.getX() + (p.getWidth() - b.getSize()) / 2.0);
+            b.setY(p.getY() - b.getSize() - 2);
+        }
         engine.render(g);
     }
-
-    @Override
-    public void update(long dt) {}
 }

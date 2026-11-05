@@ -3,7 +3,8 @@ package gui;
 public final class ScreenManagerHolder {
     private static ScreenManager instance;
 
-    private ScreenManagerHolder() {}
+    private ScreenManagerHolder() {
+    }
 
     public static void init(ScreenManager screens) {
         instance = screens;

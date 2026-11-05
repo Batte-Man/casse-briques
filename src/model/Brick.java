@@ -18,25 +18,43 @@ public abstract class Brick implements Updatable, Drawable {
         this.height = height;
     }
 
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    public boolean isDestroyed() { return destroyed; }
-    protected void destroy() { destroyed = true; }
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    protected void destroy() {
+        destroyed = true;
+    }
 
     @Override
-    public void update(long dt) { }
+    public void update(long dt) {
+    }
 
     @Override
     public void draw(Graphics g) {
         if (!destroyed) {
-            g.fillRect((int)x, (int)y, width, height);
+            g.fillRect((int) x, (int) y, width, height);
         }
     }
 
     public Rectangle getBounds() {
-        return new Rectangle((int)x, (int)y, width, height);
+        return new Rectangle((int) x, (int) y, width, height);
     }
 
     public abstract void onCollide(GameEngine engine, Ball ball);

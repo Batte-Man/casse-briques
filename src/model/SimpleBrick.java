@@ -1,6 +1,8 @@
 package model;
 
+import gui.UIConfig;
 import metier.GameEngine;
+
 import java.awt.*;
 
 public class SimpleBrick extends Brick {
@@ -17,8 +19,8 @@ public class SimpleBrick extends Brick {
     public void draw(Graphics g) {
         if (isDestroyed()) return;
         Color old = g.getColor();
-        g.setColor(Color.YELLOW);
-        g.fillRect((int)x, (int)y, width, height);
+        g.setColor(UIConfig.ACCENT_COLOR_1);
+        g.fillRect((int) x, (int) y, width, height);
         g.setColor(old);
     }
 

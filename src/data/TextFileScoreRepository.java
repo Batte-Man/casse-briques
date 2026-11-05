@@ -1,6 +1,7 @@
 package data;
 
 import model.ScoreEntry;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.time.LocalDateTime;

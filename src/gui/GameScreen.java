@@ -1,6 +1,7 @@
 package gui;
 
 import model.GameConfig;
+
 import java.awt.*;
 
 public class GameScreen extends AbstractScreen {
@@ -12,20 +13,22 @@ public class GameScreen extends AbstractScreen {
 
         this.panel.setLayout(new BorderLayout());
         this.panel.add(gamePanel, BorderLayout.CENTER);
-        this.panel.setBackground(UIConfig.BG_COLOR);
+        this.panel.setBackground(UIConfig.BG_COLOR_PRIMARY);
         this.panel.setPreferredSize(new Dimension(GameConfig.WIDTH, GameConfig.HEIGHT));
     }
 
     @Override
-    protected void initComponents() {}
+    protected void initComponents() {
+    }
 
     @Override
-    protected void initListeners() {}
+    protected void initListeners() {
+    }
 
     @Override
     public void onShow() {
-        gamePanel.bindKeys();
+        //gamePanel.bindKeys();
         gamePanel.requestFocusInWindow();
-        gamePanel.startLoop();
+        //gamePanel.startLoop();
     }
 }

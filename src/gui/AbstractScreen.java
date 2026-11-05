@@ -14,10 +14,13 @@ public abstract class AbstractScreen implements Screen {
     }
 
     @Override
-    public JPanel getPanel() { return panel; }
+    public JPanel getPanel() {
+        return panel;
+    }
 
     @Override
-    public void onShow() {}
+    public void onShow() {
+    }
 
     protected abstract void initComponents();
 

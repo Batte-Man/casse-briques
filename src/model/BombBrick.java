@@ -1,5 +1,6 @@
 package model;
 
+import gui.UIConfig;
 import metier.GameEngine;
 import metier.Updatable;
 
@@ -46,8 +47,8 @@ public class BombBrick extends Brick {
     public void draw(Graphics g) {
         if (isDestroyed()) return;
         Color old = g.getColor();
-        g.setColor(Color.RED);
-        g.fillRect((int)getX(), (int)getY(), getWidth(), getHeight());
+        g.setColor(UIConfig.DANGER_COLOR);
+        g.fillRect((int) getX(), (int) getY(), getWidth(), getHeight());
         g.setColor(old);
     }
 }

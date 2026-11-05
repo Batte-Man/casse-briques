@@ -22,21 +22,23 @@ public class CollisionService implements ICollisionService {
 
         Velocity v = ball.getVelocity().invertY();
 
-        double norm   = computeNormalizedPosition(ball, paddle);
+        double norm = computeNormalizedPosition(ball, paddle);
         double factor = GameConfig.getAngleAdjustFactor(engine.getDifficulty());
         v = v.withDx(v.dx() + norm * factor);
-
         double speed = GameConfig.getBallSpeed(engine.getDifficulty());
-
         v = v.normalize().scale(speed);
 
         double minAngle = Math.toRadians(20);
-        double minDy    = speed * Math.sin(minAngle);
+        double minDy = speed * Math.sin(minAngle);
         if (Math.abs(v.dy()) < minDy) {
             double dy = -minDy;
-            double dx = Math.copySign(Math.sqrt(speed*speed - dy*dy), v.dx());
+            double dx = Math.copySign(Math.sqrt(speed * speed - dy * dy), v.dx());
             v = new Velocity(dx, dy);
         }
+
+        v = ball.getVelocity().invertY();
+        speed = GameConfig.getBallSpeed(engine.getDifficulty());
+        v = v.normalize().scale(speed);
 
         ball.setVelocity(v);
     }
@@ -47,14 +49,17 @@ public class CollisionService implements ICollisionService {
 
         brick.onCollide(engine, ball);
 
-        double incr = GameConfig.getBallSpeedIncrement(engine.getDifficulty());
-        Velocity v = ball.getVelocity().invertY().scale(incr);
+        Velocity v = ball.getVelocity().invertY();
+
+        double speed = GameConfig.getBallSpeed(engine.getDifficulty());
+        v = v.normalize().scale(speed);
+
         ball.setVelocity(v);
     }
 
     private double computeNormalizedPosition(Ball ball, Paddle paddle) {
         double paddleCenter = paddle.getX() + paddle.getWidth() / 2.0;
-        double ballCenter   = ball.getX() + ball.getSize()  / 2.0;
+        double ballCenter = ball.getX() + ball.getSize() / 2.0;
         return (ballCenter - paddleCenter) / (paddle.getWidth() / 2.0);
     }
 }

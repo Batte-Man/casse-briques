@@ -1,10 +1,10 @@
 package model;
 
-import metier.GameEngine;
-import metier.Updatable;
+import gui.UIConfig;
 import metier.Drawable;
-import java.awt.Graphics;
-import java.awt.Color;
+import metier.GameEngine;
+
+import java.awt.*;
 
 public class MultiBallBrick extends Brick implements Drawable {
     public MultiBallBrick(double x, double y, int width, int height) {
@@ -32,8 +32,8 @@ public class MultiBallBrick extends Brick implements Drawable {
     public void draw(Graphics g) {
         if (isDestroyed()) return;
         Color old = g.getColor();
-        g.setColor(Color.MAGENTA);
-        g.fillRect((int)getX(), (int)getY(), getWidth(), getHeight());
+        g.setColor(UIConfig.ACCENT_COLOR_2);
+        g.fillRect((int) getX(), (int) getY(), getWidth(), getHeight());
         g.setColor(old);
     }
 }
