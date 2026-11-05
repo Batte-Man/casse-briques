@@ -190,6 +190,4 @@ public class GameEngine {
         }
     }
 
-    public void addVictoryListener(Object onWin) {
-    }
 }
