@@ -30,7 +30,7 @@ public class Main {
             VictoryScreen win = new VictoryScreen(screens, controller);
             controller.setVictoryScreen(win);
 
-            screens.register("victory", new VictoryScreen(screens, controller));
+            screens.register("victory", win);
             screens.register("menu", new MenuScreen(screens, controller));
             screens.register("game", new GameScreen(screens, panel));
             screens.register("pause", new PauseScreen(screens, controller));
