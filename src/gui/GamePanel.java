@@ -10,10 +10,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class GamePanel extends JPanel implements Runnable {
+public class GamePanel extends JPanel {
+    private static final int FRAME_MS = 16; // ~60 images/s
     private final GameEngine engine;
     private GameController controller;
-    private Thread loop;
+    private Timer loop;
 
     public GamePanel(GameEngine engine) {
         this.engine = engine;
@@ -59,23 +60,20 @@ public class GamePanel extends JPanel implements Runnable {
         });
     }
 
+    /**
+     * Boucle de jeu basée sur javax.swing.Timer : chaque tick s'exécute sur l'EDT,
+     * le même thread que le rendu et le clavier. Avec un Thread séparé, le moteur était
+     * modifié pendant que Swing le dessinait, et les changements d'écran (game over,
+     * victoire) se faisaient hors de l'EDT, ce que Swing n'autorise pas.
+     */
     private void startLoop() {
-        loop = new Thread(this, "GameLoop");
-        loop.start();
-    }
-
-    @Override
-    public void run() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                if (engine.getState() == GameState.RUNNING) {
-                    engine.update(16);
-                    repaint();
-                }
-                Thread.sleep(16);
+        loop = new Timer(FRAME_MS, e -> {
+            if (engine.getState() == GameState.RUNNING) {
+                engine.update(FRAME_MS);
+                repaint();
             }
-        } catch (InterruptedException ignored) {
-        }
+        });
+        loop.start();
     }
 
     @Override
