@@ -9,3 +9,5 @@ target/
 # Donnees generees a l'execution
 scores.txt
 scores.dat
+build/
+*.jar
